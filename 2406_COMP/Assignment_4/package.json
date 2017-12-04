@@ -1,0 +1,19 @@
+{
+    "name": "base_code",
+    "version": "1.0.0",
+    "description": "",
+    "main": "food2fork_server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node food2fork_server.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.15.3",
+        "request": "^2.81.0",
+        "morgan": "^1.9.0",
+        "serve-favicon": "^2.4.5",
+        "sqlite": "^2.8.0"
+    }
+}
