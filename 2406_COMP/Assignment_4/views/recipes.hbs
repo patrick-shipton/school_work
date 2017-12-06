@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title> {{title}} </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="wrapper">
+            Enter Ingredient Name: <input type="text" name="ingredient" id="ingredient" value=""></input>
+            <button id="submit" onclick="getRecipesByIngredients()" style="margin-bottom: 50px;">Search Ingredients</button>
+            <button id="submit" onclick="getRecipesBySpices()" style="margin-bottom: 50px;">Search Spices</button>
+        </div>
+        <div id="ingredientRecipes">
+		{{#each userEntries}} 
+			<div class='recipe'>
+				<div class='recipe-photo'>
+					<a href="{{this.recipe_url}}" target="_blank">
+						<img src="{{this.image_url}}">
+					</a>
+				</div>
+				<h2>{{this.recipe_name}}</h2>
+			</div>
+		{{/each}} 
+		</div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

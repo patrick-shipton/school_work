@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head> 
+  <title> {{title}} </title>
+</head>
+<body>
+   <h1>{{title}}</h1>
+<div> 
+   {{#each recipeEntries}} 
+      <h1>{{this.id}}  Name: {{this.recipe_name}}</h1> 
+      <p>Contributor: {{this.contributor}}</p>
+      <p>Category: {{this.category}}</p>
+      <p>Description: {{this.description}}</p>
+      <p>Source: {{this.source}}</p>
+      <p>Spice rating: {{this.rating}}</p>
+      <p>Ingredients: {{this.ingredients}}</p>
+      <p>Directions: {{this.directions}}</p>
+	{{/each}} 
+</div>
+</body>
+</html>

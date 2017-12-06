@@ -118,6 +118,16 @@ exports.users = function(request, response){
 
 }
 
+exports.recipes = function(request, response){
+        // users.html
+		db.all("SELECT recipe_name, spices, id, description FROM recipes", function(err, rows){
+			console.log(rows);
+			console.log(rows[0].description);
+		})
+}
+
+
+
 exports.find = function (request, response){
         // find.html
 		console.log("RUNNING FIND SONGS");
