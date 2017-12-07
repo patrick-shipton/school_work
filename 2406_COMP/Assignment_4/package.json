@@ -1,20 +1,20 @@
 {
-    "name": "base_code",
+    "name": "recipe_server",
     "version": "1.0.0",
     "description": "",
     "main": "food2fork_server.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node food2fork_server.js"
+        "update_db": "node 02xml_parser_create_db.js",
+        "start": "node 01server_recipes.js"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "request": "^2.81.0",
-        "morgan": "^1.9.0",
-        "serve-favicon": "^2.4.5",
-        "sqlite": "^2.8.0",
         "express": "^4.16.2",
-        "hbs": "^4.0.1"
+        "hbs": "^4.0.1",
+        "morgan": "^1.9.0",
+        "request": "^2.83.0",
+        "serve-favicon": "^2.4.5",
+        "sqlite": "^2.9.0"
     }
 }

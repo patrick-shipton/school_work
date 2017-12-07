@@ -1,7 +1,9 @@
+/*
+Provides functions for the server_recipe.js server
+*/
 
-var url = require('url');
-var sqlite3 = require('sqlite3').verbose(); //verbose provides more detailed stack trace
-//const db = new sqlite3.Database('data/db_1200iRealSongs');
+const url = require('url');
+const sqlite3 = require('sqlite3').verbose(); //verbose provides more detailed stack trace
 const db = new sqlite3.Database('data/db_recipes');
 
 db.serialize(function(){
@@ -73,6 +75,7 @@ exports.authenticate = function (request, response, next){
 	//notice no call to next()
   
 }
+
 function addHeader(request, response){
         // about.html
         var title = 'COMP 2406:';
@@ -91,13 +94,6 @@ function addFooter(request, response){
 
 }
 
-
-
-exports.index = function (request, response){
-        // index.html
-	     response.render('index', { title: 'COMP 2406', body: 'rendered with handlebars'});
-}
-
 function parseURL(request, response){
 	var parseQuery = true; //parseQueryStringIfTrue 
     var slashHost = true; //slashDenoteHostIfTrue 
@@ -111,6 +107,55 @@ function parseURL(request, response){
 
 }
 
+function getSqlCommand(request, response){
+	//builds sqlite command to search for ingredients or spices
+	var urlObj = parseURL(request, response);		
+	var sql = "SELECT * FROM recipes";
+	var firstTag = true;
+   
+	if(urlObj.query['ingredients'] || urlObj.query['spices']) {
+		let searchIngredients = "";
+		let searchSpices = "";
+		sql += " WHERE ";
+		
+		if(urlObj.query['ingredients']){
+			var ingredients = urlObj.query['ingredients'].split(",").map(function(item) {
+				return item.trim();
+			});
+			
+			for(let i=0; i<ingredients.length; i++){
+				searchIngredients += " (ingredients LIKE '%" + ingredients[i] + "%')";
+				if(i != (ingredients.length)-1){
+					searchIngredients += " AND ";
+				}
+			}
+			if(!firstTag){sql += " AND ";}
+			sql += searchIngredients + "";
+			firstTag = false;
+		}
+		
+		if(urlObj.query['spices']){
+			var spices = urlObj.query['spices'].split(",").map(function(item) {
+				return item.trim();
+			});
+			
+			for(let i=0; i<spices.length; i++){
+				searchSpices += "(spices LIKE '%" + spices[i] + "%')";
+				if(i != (spices.length)-1){searchSpices += " AND ";}
+			}
+			
+			if(!firstTag){sql += " AND ";}
+			sql += searchSpices;
+			firstTag = false;
+		}
+		
+		console.log("Finding " + searchIngredients + " and " + searchSpices);
+	}
+	return sql;
+}
+
+
+
 exports.users = function(request, response){
 	// users.html
 	db.all("SELECT userid, password FROM users", function(err, rows){
@@ -118,65 +163,57 @@ exports.users = function(request, response){
 	});
 };
 
-exports.recipes = function(request, response){
-	// users.html
-	db.all("SELECT recipe_name, spices, id, description FROM recipes", function(err, rows){
-		for(let i=0; i<rows.length; i++){
-			rows[i].recipe_url = "\\recipe\\" + rows[i].id;
-			rows[i].image_url = "recipe-default.png"
-		}
-		//console.log(rows);
-		response.render('recipes', {title : 'Recipes:', userEntries: rows});
-	});
-};
-
 exports.recipesData = function(request, response){
-	let ingredient = request.query.ingredient;
-	let spice = request.query.spice;
-	// users.html
-	db.all("SELECT recipe_name, spices, id, description FROM recipes", function(err, rows){
+	// sends recipes json data to be rendered by client js
+	console.log("\n\nRUNNING RECIPESDATA");
+	
+	let sql = getSqlCommand(request, response);
+	console.log(sql);
+	
+	db.all(sql, function(err, rows){
+		if(err) console.log(err);
 		for(let i=0; i<rows.length; i++){
 			rows[i].recipe_url = "\\recipe\\" + rows[i].id;
 			rows[i].image_url = "recipe-default.png"
 		}
 		//console.log(rows);
-		response.render('recipes', {title : 'Recipes:', userEntries: rows});
+		response.contentType('text/html').send(JSON.stringify(rows));
 	});
 };
 
 exports.find = function (request, response){
-        // find.html
-		console.log("RUNNING FIND SONGS");
-		
-		var urlObj = parseURL(request, response);		
-		var sql = "SELECT id, title FROM songs";
-        
-        if(urlObj.query['title']) {
-		    console.log("finding title: " + urlObj.query['title']);
-		    sql = "SELECT id, title FROM songs WHERE title LIKE '%" + urlObj.query['title'] + "%'"; 			
-		}		
-
-		db.all(sql, function(err, rows){
-	       response.render('songs', {title: 'Songs:', songEntries: rows});
- 		});
+	// feeds recipes data to recipes.hbs and sends to client
+	console.log("\n\nRUNNING FIND RECIPES");
+	
+	let sql = getSqlCommand(request, response);
+	console.log(sql);
+	
+	db.all(sql, function(err, rows){
+		if(err) console.log(err);
+		for(let i=0; i<rows.length; i++){
+			rows[i].recipe_url = "\\recipe\\" + rows[i].id;
+			rows[i].image_url = "recipe-default.png"
+		}
+		//console.log(rows);
+		response.render('recipes', {title : 'Recipes:', userEntries: rows});
+	});
 };
 
 exports.recipeDetails = function(request, response){
-        console.log("RECIPE DETAILS Request");
-        console.log(request);
-	    var urlObj = parseURL(request, response);
-        var recipeID = urlObj.path; //expected form: /song/235
-		recipeID = recipeID.substring(recipeID.lastIndexOf("/")+1, recipeID.length);
-		
-		var sql = "SELECT * FROM recipes WHERE id=" + recipeID;
-        console.log("GET RECIPE DETAILS: " + recipeID );
-		
-		db.all(sql, function(err, rows){
-			console.log('Recipe Data');
-			console.log(rows);
-			response.render('recipeDetails', {title: 'Recipe Details:', recipeEntries: rows});
-		});
-
+	// renders specific song
+	console.log("\n\nRECIPE DETAILS Request");
+	
+	var urlObj = parseURL(request, response);
+	var recipeID = urlObj.path; //expected form: /song/235
+	recipeID = recipeID.substring(recipeID.lastIndexOf("/")+1, recipeID.length);
+	
+	var sql = "SELECT * FROM recipes WHERE id=" + recipeID;
+	console.log("GET RECIPE " + recipeID );
+	
+	db.all(sql, function(err, rows){
+		//console.log(rows);
+		response.render('recipeDetails', {title: 'Recipe Details:', recipeEntries: rows});
+	});
 }
 
 

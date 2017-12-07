@@ -2,14 +2,13 @@
 NOTE: You need to intall the npm modules by executing >npm install
 before running this server
 
-Simple express server re-serving data from food2fork.com
+Simple express server re-serving data from db_recipes (aLaCarteData.xml)
 To test: 
 http://localhost:3000
 or
-http://localhost:3000/recipes?ingredient=Ginger
-to just set JSON response. (Note it is helpful to add a JSON formatter extension, like JSON Formatter, to your Chrome browser for viewing just JSON data.)
-*
-Testing: (user: ldnel password: secret)
+http://localhost:3000/recipes?ingredient=Ginger&spices=cumin
+
+Testing Account: (user: ldnel password: secret)
 */
 
 //Cntl+C to stop server
@@ -22,7 +21,7 @@ var logger = require('morgan');
 
 var  app = express(); //create express middleware dispatcher
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,12 +56,13 @@ app.use(logger('dev'));
 app.use(express.static(__dirname + '/public'));
 //app.use(methodLogger);
 //routes
-app.get('/', routes.recipes); 
-app.get('/find', routes.find);
-app.get('/users', routes.users);
-app.get('/recipes', routes.recipes);
-app.post('/recipes', recipesData);
-app.get('/recipe/*', routes.recipeDetails);
+app.get('/', 			routes.find); 
+app.get('/users', 		routes.users);
+app.get('/recipe/*', 	routes.recipeDetails);
+app.get('/recipes*', 	routes.find);
+//post to return json data
+app.post('/recipes', 	routes.recipesData);
+
 
 //start server
 app.listen(PORT, err => {

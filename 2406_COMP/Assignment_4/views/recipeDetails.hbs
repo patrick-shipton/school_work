@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head> 
-  <title> {{title}} </title>
+	{{#each recipeEntries}} 
+  <title>{{this.recipe_name}} </title>
 </head>
 <body>
-   <h1>{{title}}</h1>
+   <h1>{{this.recipe_name}}</h1>
 <div> 
-   {{#each recipeEntries}} 
-      <h1>{{this.id}}  Name: {{this.recipe_name}}</h1> 
-      <p>Contributor: {{this.contributor}}</p>
-      <p>Category: {{this.category}}</p>
-      <p>Description: {{this.description}}</p>
-      <p>Source: {{this.source}}</p>
-      <p>Spice rating: {{this.rating}}</p>
-      <p>Ingredients: {{this.ingredients}}</p>
-      <p>Directions: {{this.directions}}</p>
+	<h2>{{this.description}}</h2>
+	<p>Index: {{this.id}}</h1> 
+	<p>Contributor: {{this.contributor}}</p>
+	<p>Category: {{this.category}}</p>
+	<p>Source: {{this.source}}</p>
+	<p>Spice rating: {{this.rating}}</p>
+	
+	<p>Spices: {{this.spices}}</p>
+	<h2>Ingredients: {{this.ingredients}}</h2>
+	<h2>Directions: {{this.directions}}</h2>
 	{{/each}} 
 </div>
 </body>

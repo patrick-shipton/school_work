@@ -1,0 +1,7 @@
+*.tar
+
+*.zip
+
+2406_COMP/Assignment_4/node_modules
+2406_COMP/Assignment_4/node_modules/content-type/index.js
+2406_COMP/Assignment_4/node_modules/kind-of/LICENSE
