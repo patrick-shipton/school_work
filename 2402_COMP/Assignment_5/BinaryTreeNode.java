@@ -1,4 +1,4 @@
-package comp2402a5;
+//package comp2402a5;
 
 /**
  * This class represents a node in a binary tree. This class is abstract and
