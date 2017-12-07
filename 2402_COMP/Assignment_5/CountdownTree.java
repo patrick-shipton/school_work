@@ -31,7 +31,13 @@ BinarySearchTree<CountdownTree.Node<T>, T> implements SSet<T> {
 		u.timer = (int)Math.ceil(d);
 		u.x = x;
 		if (super.add(u)) {
-			// add some code here
+			while(u.parent != nil){
+				u = u.parent;
+				u.timer--;
+				if(u.timer == 0){
+					explode(u);
+				}
+			}
 			return true;
 		}
 		return false;
@@ -40,7 +46,13 @@ BinarySearchTree<CountdownTree.Node<T>, T> implements SSet<T> {
 	public void splice(Node<T> u) {
 		Node<T> w = u.parent;
 		super.splice(u);
-		// add some code here (we just removed u from the tree
+		while(u.parent != nil){
+			u = u.parent;
+			u.timer--;
+			if(u.timer == 0){
+				explode(u);
+			}
+		}
 	}
 
 	protected void explode(Node<T> u) {
