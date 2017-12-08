@@ -1,20 +1,16 @@
 /* 
-File is createBinary.c
+File is singleSpawn.c
 
 Purpose:
-a program that creates a binary file for testing the prime number program 
+a program that takes a unsigned int from a binary file and creates a child that morphs into isPrime.c
 
 input:
-a sequence of numbers to be tested
+path to binary file
 
 output:
-0 - if success
-1 - if an error occured
-a binary file with the name.   
-
-Assumption:
-1. the program does not check if the number is a positive integer
-2. the program overwrites that file testPrime.bin
+prints whether the number from file is prime or not
+-1 - if an error occured
+0  - if success
 
 */ 
 
@@ -56,9 +52,9 @@ int main(int argc, char *argv[]){
 	}
 		
 	fread(&n, sizeof(unsigned int), 1, file);
-	printf("Num1 %d \n", n);
+	//printf("Num1 %u \n", n);
 	sprintf(numStr, "%d", n);
-	printf("Num2 %s \n", numStr);
+	//printf("Num2 %s \n", numStr);
 
 	cpid = fork();
 	if (cpid == 0){
@@ -68,11 +64,12 @@ int main(int argc, char *argv[]){
 		if (WIFEXITED(status) != 0){
 			int returned = WEXITSTATUS(status);
 			if(returned == 0){
-				printf("%d is NOT a prime number\n", n);
+				printf("%u is NOT a prime number\n", n);
 			} else if (returned == 1){
-				printf("%d is a prime number \n", n);
+				printf("%u is a prime number \n", n);
 			} else {
 				printf("error\n");
+				exit(-1);
 			}
 		} 
 	}

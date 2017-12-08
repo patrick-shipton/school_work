@@ -1,16 +1,20 @@
 /* 
-File is singlePrime.c
+File is createBinary.c
 
 Purpose:
-a program that takes a unsigned int from a binary file and morphs into isPrime.c
+a program that creates a binary file for testing the prime number program 
 
 input:
-path to binary file
+a sequence of numbers to be tested
 
 output:
--1 - if an error occured
-0  - if the input number is not a prime number
-1  - if the input number is a prime number
+0 - if success
+1 - if an error occured
+a binary file with the name.   
+
+Assumption:
+1. the program does not check if the number is a positive integer
+2. the program overwrites that file testPrime.bin
 
 */ 
 
@@ -51,16 +55,14 @@ int main(int argc, char *argv[]){
 	}
 		
 	fread(&n, sizeof(unsigned int), 1, file);
-	//printf("Num1 %u", n);
+	printf("Num1 %d", n);
 	sprintf(numStr, "%d", n);
-	//printf("Num2 %s", numStr);
-	if(morph(numStr) == -1){
-		printf("morph failed");
-	}
-
+	printf("Num2 %s", numStr);
+	morph(numStr);
+	
 	if (file != NULL) fclose(file);
 	
-	exit(-1);
+	exit(0);
 }
 
 

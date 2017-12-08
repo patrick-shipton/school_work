@@ -1,0 +1,9 @@
+prime: isPrime.c 
+	gcc -g -o prime isPrime.c
+
+multiSpawn: prime multiSpawn.c 
+	gcc -g -o multiSpawn multiSpawn.c
+
+clean:
+	rm -f prime multiSpawn
+

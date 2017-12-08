@@ -67,10 +67,10 @@ int isPrime(unsigned int number)
 	for(i = 2; i*i <= number; i++) {
 		usleep(100);
 		if (number % i == 0) {
-			//printf("%d is NOT a prime number\n",number);
+			printf("%d is NOT a prime number\n",number);
 			return(0);
 		}
 	}
-    	//printf("%d is a prime number\n",number);
+    	printf("%d is a prime number\n",number);
 	return(1);
 }
