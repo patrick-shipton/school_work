@@ -4,6 +4,8 @@ import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.AbstractMap.SimpleEntry;
 
 /**
 * An unfinished implementation of an Countdown tree (for exercises)
@@ -66,8 +68,53 @@ BinarySearchTree<CountdownTree.Node<T>, T> implements SSet<T> {
 		traverse6(u.left, s+1, position + " left");
 		traverse6(u.right,s+1, position + " right");
 	}
-
-
+	
+	public void left(Node<T> u, HashMap<Node<T>,Entry<Integer,Integer>> sizeMap, int heightL, int heightR){
+		int heightRL = 0;
+		int sizeL = 0;
+		if(u.left != nil){
+			sizeL = sizeMap.get(u.left).getKey();
+		}
+		int size = 1 + sizeL;
+		if(u.right != nil){
+			if(u.right.left != nil){
+				size += sizeMap.get(u.right.left).getKey();
+				heightRL = sizeMap.get(u.right.left).getValue();
+			}
+			int sizeTemp = sizeMap.get(u.right).getKey() + 1 + sizeL;
+			int heightTemp = 1 + ((heightRL > heightL) ? heightRL : heightL); //??
+			sizeMap.put(u.right, new SimpleEntry<>(sizeTemp, heightTemp));
+			u.right.timer = (int)Math.ceil(d * sizeTemp);
+		}
+		rotateLeft(u);
+		
+		sizeMap.put(u, new SimpleEntry<>(size, 1 + ((heightRL > heightL) ? heightRL : heightL))); //??
+		u.timer = (int)Math.ceil(d * size);
+	}
+	
+	public void right(Node<T> u, HashMap<Node<T>, Entry<Integer,Integer>> sizeMap, int heightL, int heightR){
+		int heightLR = 0;
+		int sizeR = 0;
+		if(u.right != nil){
+			sizeR = sizeMap.get(u.right).getKey();
+		}
+		int size = 1 + sizeR;
+		if(u.left != nil){
+			if(u.left.right != nil){
+				size += sizeMap.get(u.left.right).getKey();
+				heightLR = sizeMap.get(u.left.right).getValue();
+			}
+			int sizeTemp = sizeMap.get(u.left).getKey() + 1 + sizeR;
+			int heightTemp = 1 + ((heightLR > heightR) ? heightLR : heightR); //??
+			sizeMap.put(u.right, new SimpleEntry<>(sizeTemp, heightTemp));
+			u.left.timer = (int)Math.ceil(d * sizeTemp);
+		}
+		rotateRight(u);
+		
+		sizeMap.put(u, new SimpleEntry<>(size, 1 + ((heightLR > heightR) ? heightLR : heightR))); //??
+		u.timer = (int)Math.ceil(d * size);
+	}
+	
 	public void explode(Node<T> v) {
 		// Write this code to explode u
 		// Make sure to update u.parent and/or r (the tree root) as appropriate
@@ -77,104 +124,90 @@ BinarySearchTree<CountdownTree.Node<T>, T> implements SSet<T> {
 		
 		// size vs height?
 		// Can I balance from the base?
-		HashMap<Node<T>,Integer> sizeMap = new HashMap<Node<T>,Integer>();
-		System.out.println("\n\nExplode " + v.x);
-		
-		//traverse6(r,0,"");
+		HashMap<Node<T>,Entry<Integer,Integer>> sizeMap = new HashMap<Node<T>,Entry<Integer,Integer>>();
+		//HashMap<Node<T>,Integer> heightMap = new HashMap<Node<T>,Integer>();
+		//new SimpleEntry<>(size,height)
+		// getKey = size getValue = height
 		
 		Node<T> u = v, prev = v.parent, next;
-		int size, sizeTemp, sizeL, sizeR, sizeLR, sizeRL, sizeRR, sizeLL;
+		int size;
+		int heightR, heightL, heightLR, heightRL, heightRR, heightLL;
 		boolean visit = false;
 		while (u != nil && u != v.parent) {
 			visit = false;
 			if (prev == u.parent) {
-				if (u.left != nil && u != v.parent){
-					next = u.left;
-				}
-				else if (u.right != nil) {
-					next = u.right;
-				}
-				else {
-					next = u.parent;
-					//visit(u)
-					visit = true;
-				}
+				if (u.left != nil && u != v.parent){next = u.left;}
+				else if (u.right != nil) {next = u.right;}
+				else {next = u.parent;visit = true;}
+				
 			} else if (prev == u.left) {
-				if (u.right != nil && u != v.parent){
-					next = u.right;
-				}
-				else{
-					next = u.parent;
-					//visit(u);
-					visit = true;
-				}
-			} else {
-				next = u.parent;
-				//visit(u);
-				visit = true;
-			}
+				if (u.right != nil && u != v.parent){next = u.right;}
+				else{next = u.parent;visit = true;}
+				
+			} else {next = u.parent;visit = true;}
+			
 			prev = u;
 			if(visit){
-				size = 1;
-				sizeL = 0; // for calculations
-				sizeR = 0; // for calculations
-				//System.out.println("Special: " + u.x + " prev: " + prev.x);
-				if(u.left != nil){
-					sizeL = sizeMap.get(u.left);
-					size += sizeL;
-				} 
-				if(u.right != nil){
-					sizeR = sizeMap.get(u.right);
-					size += sizeR;
-				}
-				//System.out.println("sizes L" + sizeL + " S" + size + " R" + sizeR);
-				if(2*size <= (3*sizeL) ){
-					System.out.println("rotateRight " + 2*size + " < " + 3*sizeL);
-					size = 1 + sizeR;
+				heightL = 0; heightR = 0;
+				if(u.left != nil){heightL = sizeMap.get(u.left).getValue();} 
+				if(u.right != nil){heightR = sizeMap.get(u.right).getValue();}
+				
+				//left case
+				if(heightR + 1 < heightL){
+					heightLR = 0;
+					heightLL = 0;
 					if(u.left != nil){
 						if(u.left.right != nil){
-							size += sizeMap.get(u.left.right);
+							heightLR = sizeMap.get(u.left.right).getValue();
 						}
-						sizeTemp = sizeMap.get(u.left) + 1 + sizeL;
-						sizeMap.put(u.left, sizeTemp);
-						u.left.timer = (int)Math.ceil(d * sizeTemp);
-					}
-					rotateRight(u);
-					traverse6(r,0,"");
-					prev = u;
-					next = u.parent;
-					
-					
-				} else if(2*size <= (3*sizeR)){
-					System.out.println("rotateLeft " + 2*size + " < " + 3*sizeR);
-					size = 1 + sizeL;
-					if(u.right != nil){
-						if(u.right.left != nil){
-							size += sizeMap.get(u.right.left);
+						if(u.left.left != nil){
+							heightLL = sizeMap.get(u.left.left).getValue();
 						}
-						sizeTemp = sizeMap.get(u.right) + 1 + sizeR;
-						sizeMap.put(u.right, sizeTemp);
-						u.right.timer = (int)Math.ceil(d * sizeTemp);
 					}
-					rotateLeft(u);
-					traverse6(r,0,"");
-					prev = u.parent.left;
-					next = u.parent;
+					if(heightLL < heightLR){
+						//left right case
+						left(u.left, sizeMap, heightL, heightR);
+					}
+					// else
+						// left left
+					right(u, sizeMap, heightL, heightR);
+					prev = nil;
+					if(u.parent != nil){next = u.parent;
+					} else {next = nil;}
 				}
-				sizeMap.put(u, size);
-				u.timer = (int)Math.ceil(d * size);
-				//System.out.println("u.x: " + u.x + "[" + size + "]");
-				//traverse6(r,0,"");
-				//System.out.println("");
+				// right case
+				else if(heightL + 1 < heightR){
+					heightRR = 0;
+					heightRL = 0;
+					if(u.right != nil){
+						if(u.right.right != nil){
+							heightRR = sizeMap.get(u.right.right).getValue();
+						}
+						if(u.right.left != nil){
+							heightRL = sizeMap.get(u.right.left).getValue();
+						}
+					}
+					if(heightRR < heightRL){
+						//left right case
+						right(u.right, sizeMap, heightL, heightR);
+					} 
+					//else
+						//right right case
+					left(u, sizeMap, heightL, heightR);
+					prev = nil;
+					if(u.parent != nil){next = u.parent;
+					} else {next = nil;}
+				} else {
+					// default
+					size = 1;
+					if(u.left != nil){size += sizeMap.get(u.left).getKey();} 
+					if(u.right != nil){size += sizeMap.get(u.right).getKey();}
+					sizeMap.put(u, new SimpleEntry<>(size,1 + ((heightL > heightR) ? heightL : heightR)));
+					u.timer = (int)Math.ceil(d * size);
+				}
 			}
 			u = next;
 		}
-		
-		//postorder to countdown
-		
-		//preorder to rebuild
-		System.out.println("End of Explode " + v.x);
-		traverse6(r,0,"");
 	}
 
 	// Here is some test code you can use
@@ -192,6 +225,7 @@ BinarySearchTree<CountdownTree.Node<T>, T> implements SSet<T> {
 		Testum.sortedSetSpeedTests(ell, 1000000);
 		//*/
 		
+		/*
 		CountdownTree<Integer> t = new CountdownTree<Integer>(2);
 		t.add(1);
 		t.add(2);
@@ -201,9 +235,11 @@ BinarySearchTree<CountdownTree.Node<T>, T> implements SSet<T> {
 		t.add(6);
 		t.add(7);
 		t.add(8);
+		t.add(9);
 		System.out.println(t);
 		t.traverse6(t.r,0,"");
 		System.out.println("\nBreak");
 		t.explode(t.r);
+		//*/
 	}
 }
